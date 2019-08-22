@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Monzo Accounts</title>
+</head>
+<body>
+    Accounts
+
+    <div th:each="account: ${accounts}">
+        <a th:href="@{/{accountId}(accountId=${account.id})}" th:text="${account.description}"></a>
+    </div>
+</body>
+</html>
