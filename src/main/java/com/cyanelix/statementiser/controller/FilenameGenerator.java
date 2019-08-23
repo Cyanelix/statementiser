@@ -1,7 +1,6 @@
 package com.cyanelix.statementiser.controller;
 
 import com.cyanelix.statementiser.domain.MonzoTransaction;
-import com.cyanelix.statementiser.domain.MonzoTransactions;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
@@ -13,7 +12,7 @@ import java.util.Objects;
 public class FilenameGenerator {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public String generateCsvFilename(String accountDescription, MonzoTransactions transactions) {
+    public String generateCsvFilename(String accountDescription, List<MonzoTransaction> transactions) {
         Objects.requireNonNull(accountDescription);
         Objects.requireNonNull(transactions);
 
@@ -21,13 +20,18 @@ public class FilenameGenerator {
             throw new IllegalArgumentException("Account description is required");
         }
 
-        List<MonzoTransaction> transactionList = transactions.getTransactions();
-        ZonedDateTime firstTransactionDate = transactionList.get(0).getCreated();
-        ZonedDateTime lastTransactionDate = transactionList.get(transactionList.size() - 1).getCreated();
+        String dateRange;
+        if (transactions.isEmpty()) {
+            dateRange = "empty";
+        } else {
+            ZonedDateTime firstTransactionDate = transactions.get(0).getCreated();
+            ZonedDateTime lastTransactionDate = transactions.get(transactions.size() - 1).getCreated();
 
-        return String.format("%s_%s..%s.csv",
-                accountDescription,
-                firstTransactionDate.format(DATE_FORMATTER),
-                lastTransactionDate.format(DATE_FORMATTER));
+            dateRange = String.format("%s..%s",
+                    firstTransactionDate.format(DATE_FORMATTER),
+                    lastTransactionDate.format(DATE_FORMATTER));
+        }
+
+        return String.format("%s_%s.csv", accountDescription, dateRange);
     }
 }

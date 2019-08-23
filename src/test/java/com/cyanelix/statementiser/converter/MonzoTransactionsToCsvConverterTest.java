@@ -1,12 +1,12 @@
 package com.cyanelix.statementiser.converter;
 
 import com.cyanelix.statementiser.domain.MonzoTransaction;
-import com.cyanelix.statementiser.domain.MonzoTransactions;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -25,8 +25,7 @@ public class MonzoTransactionsToCsvConverterTest {
     public void singleTransaction_toCsv() {
         // Given...
         MonzoTransaction monzoTransaction = createTransaction("2019-02-03T04:05:06.000Z", "Test transaction", 100, 100);
-
-        MonzoTransactions monzoTransactions = new MonzoTransactions(Collections.singletonList(monzoTransaction));
+        List<MonzoTransaction> monzoTransactions = Collections.singletonList(monzoTransaction);
 
         // When...
         String csv = new MonzoTransactionsToCsvConverter().convert(monzoTransactions);
@@ -38,10 +37,9 @@ public class MonzoTransactionsToCsvConverterTest {
     @Test
     public void multipleTransactions_toCsv() {
         // Given...
-        MonzoTransactions monzoTransactions = new MonzoTransactions(Arrays.asList(
+        List<MonzoTransaction> monzoTransactions = Arrays.asList(
                 createTransaction("2019-03-04T05:06:07.000Z", "First transaction", 100, 100),
-                createTransaction("2019-04-05T06:07:09.999Z", "Second transaction", 399, 499)
-        ));
+                createTransaction("2019-04-05T06:07:09.999Z", "Second transaction", 399, 499));
 
         // When...
         String csv = new MonzoTransactionsToCsvConverter().convert(monzoTransactions);

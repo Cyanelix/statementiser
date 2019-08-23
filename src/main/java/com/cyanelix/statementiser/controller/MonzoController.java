@@ -4,6 +4,7 @@ import com.cyanelix.statementiser.client.MonzoClient;
 import com.cyanelix.statementiser.converter.BalanceCalculator;
 import com.cyanelix.statementiser.converter.MonzoTransactionsToCsvConverter;
 import com.cyanelix.statementiser.domain.*;
+import com.cyanelix.statementiser.service.TransactionsService;
 import com.cyanelix.statementiser.state.MonzoTokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -17,19 +18,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
 public class MonzoController {
     private final MonzoClient monzoClient;
+    private final TransactionsService transactionsService;
     private final BalanceCalculator balanceCalculator;
     private final FilenameGenerator filenameGenerator;
     private final MonzoTokenHolder monzoTokenHolder;
 
     @Autowired
-    public MonzoController(MonzoClient monzoClient, BalanceCalculator balanceCalculator, FilenameGenerator filenameGenerator, MonzoTokenHolder monzoTokenHolder) {
+    public MonzoController(MonzoClient monzoClient, TransactionsService transactionsService, BalanceCalculator balanceCalculator, FilenameGenerator filenameGenerator, MonzoTokenHolder monzoTokenHolder) {
         this.monzoClient = monzoClient;
+        this.transactionsService = transactionsService;
         this.balanceCalculator = balanceCalculator;
         this.filenameGenerator = filenameGenerator;
         this.monzoTokenHolder = monzoTokenHolder;
@@ -50,10 +56,13 @@ public class MonzoController {
 
     @GetMapping("/{accountId}")
     public ResponseEntity<String> getCsv(@PathVariable("accountId") String accountId) {
-        MonzoTransactions transactions = monzoClient.getTransactions(accountId);
+        List<MonzoTransaction> transactions = transactionsService.getNewTransactions(accountId);
+
+        transactionsService.annotateTransactionsAsExported(transactions);
+
         MonzoBalance monzoBalance = monzoClient.getBalance(accountId);
 
-        MonzoTransactions transactionsWithBalances = balanceCalculator.calculateBalances(
+        List<MonzoTransaction> transactionsWithBalances = balanceCalculator.calculateBalances(
                 monzoBalance.getBalance(), transactions);
 
         String csv = new MonzoTransactionsToCsvConverter().convert(transactionsWithBalances);
@@ -72,4 +81,5 @@ public class MonzoController {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No account found with ID " + accountId));
     }
+
 }

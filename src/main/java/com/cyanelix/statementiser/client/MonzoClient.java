@@ -70,14 +70,27 @@ public class MonzoClient {
 
     public void setMetadataOnTransaction(String transactionId, Map<String, String> metadata) {
         MultiValueMap<String, String> formMap = new LinkedMultiValueMap<>();
-        metadata.entrySet().forEach();
+        metadata.forEach((key, value) -> formMap.add("metadata[" + key + "]", value));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + monzoTokenHolder.getAccessToken());
+
+        HttpEntity<MultiValueMap<String, String>> formEntity = new HttpEntity<>(formMap, headers);
+
+        MonzoTransaction monzoTransaction = restTemplate.patchForObject("https://api.monzo.com/transactions/" + transactionId, formEntity, MonzoTransaction.class);
+        System.out.println(monzoTransaction.getDescription());
     }
 
     private <T> T getWithBearerToken(String url, Class<T> returnType) {
+        return exchangeWithBearerToken(url, HttpMethod.GET, returnType);
+    }
+
+    private <T> T exchangeWithBearerToken(String url, HttpMethod method, Class<T> returnType) {
         HttpHeaders headers = createHeadersWithBearerToken();
 
         HttpEntity<Void> httpEntity = new HttpEntity<>(null, headers);
-        ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.GET, httpEntity, returnType);
+        ResponseEntity<T> responseEntity = restTemplate.exchange(url, method, httpEntity, returnType);
         return responseEntity.getBody();
     }
 

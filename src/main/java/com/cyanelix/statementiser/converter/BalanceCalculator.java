@@ -11,10 +11,9 @@ import java.util.Objects;
 
 @Component
 public class BalanceCalculator {
-    public MonzoTransactions calculateBalances(int currentBalance, MonzoTransactions monzoTransactions) {
-        Objects.requireNonNull(monzoTransactions);
+    public List<MonzoTransaction> calculateBalances(int currentBalance, List<MonzoTransaction> transactions) {
+        Objects.requireNonNull(transactions);
 
-        List<MonzoTransaction> transactions = monzoTransactions.getTransactions();
         Collections.reverse(transactions);
 
         List<MonzoTransaction> transactionsWithBalances = new ArrayList<>(transactions.size());
@@ -28,6 +27,6 @@ public class BalanceCalculator {
         }
         Collections.reverse(transactionsWithBalances);
 
-        return new MonzoTransactions(transactionsWithBalances);
+        return transactionsWithBalances;
     }
 }

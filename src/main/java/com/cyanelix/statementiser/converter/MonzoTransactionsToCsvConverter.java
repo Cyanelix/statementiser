@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class MonzoTransactionsToCsvConverter implements Converter<MonzoTransactions, String> {
+public class MonzoTransactionsToCsvConverter implements Converter<List<MonzoTransaction>, String> {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Override
-    public String convert(MonzoTransactions monzoTransactions) {
-        return monzoTransactions.getTransactions().stream()
+    public String convert(List<MonzoTransaction> monzoTransactions) {
+        return monzoTransactions.stream()
                 .map(this::transactionToCsvLine)
                 .collect(Collectors.joining("\n"));
     }
