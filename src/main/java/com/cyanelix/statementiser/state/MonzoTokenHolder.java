@@ -1,6 +1,6 @@
 package com.cyanelix.statementiser.state;
 
-import com.cyanelix.statementiser.domain.MonzoTokenReponse;
+import com.cyanelix.statementiser.monzo.MonzoTokenReponse;
 import org.springframework.stereotype.Component;
 
 @Component

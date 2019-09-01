@@ -1,6 +1,6 @@
 package com.cyanelix.statementiser.controller;
 
-import com.cyanelix.statementiser.domain.MonzoTransaction;
+import com.cyanelix.statementiser.domain.Transaction;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
@@ -12,7 +12,7 @@ import java.util.Objects;
 public class FilenameGenerator {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public String generateCsvFilename(String accountDescription, List<MonzoTransaction> transactions) {
+    public String generateCsvFilename(String accountDescription, List<Transaction> transactions) {
         Objects.requireNonNull(accountDescription);
         Objects.requireNonNull(transactions);
 

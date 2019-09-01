@@ -1,7 +1,7 @@
 package com.cyanelix.statementiser.client;
 
 import com.cyanelix.statementiser.config.MonzoClientConfig;
-import com.cyanelix.statementiser.domain.*;
+import com.cyanelix.statementiser.monzo.*;
 import com.cyanelix.statementiser.state.MonzoTokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
@@ -77,9 +76,7 @@ public class MonzoClient {
         headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + monzoTokenHolder.getAccessToken());
 
         HttpEntity<MultiValueMap<String, String>> formEntity = new HttpEntity<>(formMap, headers);
-
-        MonzoTransaction monzoTransaction = restTemplate.patchForObject("https://api.monzo.com/transactions/" + transactionId, formEntity, MonzoTransaction.class);
-        System.out.println(monzoTransaction.getDescription());
+        restTemplate.patchForObject("https://api.monzo.com/transactions/" + transactionId, formEntity, String.class);
     }
 
     private <T> T getWithBearerToken(String url, Class<T> returnType) {

@@ -1,6 +1,6 @@
 package com.cyanelix.statementiser.controller;
 
-import com.cyanelix.statementiser.domain.MonzoTransaction;
+import com.cyanelix.statementiser.domain.Transaction;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
@@ -54,10 +54,10 @@ public class FilenameGeneratorTest {
     @Test
     public void singleTransaction_generateFilename_returnOneDateToSameDate() {
         // Given...
-        List<MonzoTransaction> monzoTransactions = generateTransactions("2019-01-01T12:00:00.000Z");
+        List<Transaction> transactions = generateTransactions("2019-01-01T12:00:00.000Z");
 
         // When...
-        String filename = new FilenameGenerator().generateCsvFilename("description", monzoTransactions);
+        String filename = new FilenameGenerator().generateCsvFilename("description", transactions);
 
         // Then...
         assertThat(filename).isEqualTo("description_2019-01-01..2019-01-01.csv");
@@ -66,12 +66,12 @@ public class FilenameGeneratorTest {
     @Test
     public void twoTransactions_generateFilename_returnFirstDateToSecondDate() {
         // Given...
-        List<MonzoTransaction> monzoTransactions = generateTransactions(
+        List<Transaction> transactions = generateTransactions(
                 "2019-01-01T12:00:00.000Z",
                 "2019-01-02T12:00:00.000Z");
 
         // When...
-        String filename = new FilenameGenerator().generateCsvFilename("description", monzoTransactions);
+        String filename = new FilenameGenerator().generateCsvFilename("description", transactions);
 
         // Then...
         assertThat(filename).isEqualTo("description_2019-01-01..2019-01-02.csv");
@@ -80,21 +80,21 @@ public class FilenameGeneratorTest {
     @Test
     public void threeTransactions_generateFilename_returnFirstDateToLastDate() {
         // Given...
-        List<MonzoTransaction> monzoTransactions = generateTransactions(
+        List<Transaction> transactions = generateTransactions(
                 "2019-01-01T12:00:00.000Z",
                 "2019-01-02T12:00:00.000Z",
                 "2019-01-03T12:00:00.000Z");
 
         // When...
-        String filename = new FilenameGenerator().generateCsvFilename("description", monzoTransactions);
+        String filename = new FilenameGenerator().generateCsvFilename("description", transactions);
 
         // Then...
         assertThat(filename).isEqualTo("description_2019-01-01..2019-01-03.csv");
     }
 
-    private List<MonzoTransaction> generateTransactions(String... createdTimestamps) {
+    private List<Transaction> generateTransactions(String... createdTimestamps) {
         return Stream.of(createdTimestamps)
-                .map(timestamp -> new MonzoTransaction(ZonedDateTime.parse(timestamp), "", 0))
+                .map(timestamp -> new Transaction("", ZonedDateTime.parse(timestamp), "", 0))
                 .collect(Collectors.toList());
     }
 }

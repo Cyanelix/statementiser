@@ -1,17 +1,15 @@
-package com.cyanelix.statementiser.domain;
+package com.cyanelix.statementiser.monzo;
+
+import com.cyanelix.statementiser.domain.Transaction;
 
 import java.time.ZonedDateTime;
-import java.util.Map;
 
 public class MonzoTransaction {
-    private static final String CSV_EXPORTED_KEY = "csv-exported";
-
     private String id;
     private ZonedDateTime created;
     private String description;
     private int amount;
-    private int calculatedBalance;
-    private Map<String, String> metadata;
+    private MonzoMetadata metadata;
 
     public MonzoTransaction() { }
 
@@ -21,18 +19,16 @@ public class MonzoTransaction {
         this.amount = amount;
     }
 
-    public MonzoTransaction(ZonedDateTime created, String description, int amount, int calculatedBalance) {
-        this(created, description, amount);
-        this.calculatedBalance = calculatedBalance;
+    public Transaction toTransaction() {
+        return new Transaction(id, created, description, amount);
     }
 
-    public MonzoTransaction(MonzoTransaction sourceTransaction, int calculatedBalance) {
-        this(sourceTransaction.created, sourceTransaction.description, sourceTransaction.amount);
-        this.calculatedBalance = calculatedBalance;
+    public boolean hasBeenExported() {
+        return metadata != null && metadata.getCsvExported() != null;
     }
 
-    public boolean hasNotBeenExported() {
-        return metadata == null || !metadata.containsKey(CSV_EXPORTED_KEY);
+    public boolean isPotTransaction() {
+        return metadata != null && metadata.getPotAccountId() != null && !metadata.getPotAccountId().isEmpty();
     }
 
     public ZonedDateTime getCreated() {
@@ -59,14 +55,6 @@ public class MonzoTransaction {
         this.amount = amount;
     }
 
-    public int getCalculatedBalance() {
-        return calculatedBalance;
-    }
-
-    public void setCalculatedBalance(int calculatedBalance) {
-        this.calculatedBalance = calculatedBalance;
-    }
-
     public String getId() {
         return id;
     }
@@ -75,11 +63,11 @@ public class MonzoTransaction {
         this.id = id;
     }
 
-    public Map<String, String> getMetadata() {
+    public MonzoMetadata getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(Map<String, String> metadata) {
+    public void setMetadata(MonzoMetadata metadata) {
         this.metadata = metadata;
     }
 }

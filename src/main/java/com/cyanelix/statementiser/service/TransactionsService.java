@@ -1,8 +1,9 @@
 package com.cyanelix.statementiser.service;
 
 import com.cyanelix.statementiser.client.MonzoClient;
-import com.cyanelix.statementiser.domain.MonzoTransaction;
-import com.cyanelix.statementiser.domain.MonzoTransactions;
+import com.cyanelix.statementiser.domain.Transaction;
+import com.cyanelix.statementiser.monzo.MonzoTransaction;
+import com.cyanelix.statementiser.monzo.MonzoTransactions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class TransactionsService {
         this.monzoClient = monzoClient;
     }
 
-    public List<MonzoTransaction> getNewTransactions(String accountId) {
+    public List<Transaction> getNewTransactions(String accountId) {
         MonzoTransactions transactions = monzoClient.getTransactions(accountId);
         if (transactions == null) {
             return Collections.emptyList();
@@ -35,15 +36,17 @@ public class TransactionsService {
         }
 
         return transactionList.stream()
-                .filter(MonzoTransaction::hasNotBeenExported)
+                .filter(monzoTransaction -> !monzoTransaction.hasBeenExported())
+                .filter(transaction -> !transaction.isPotTransaction())
                 .filter(transaction -> transaction.getAmount() != 0)
+                .map(MonzoTransaction::toTransaction)
                 .collect(Collectors.toList());
     }
 
-    public void annotateTransactionsAsExported(List<MonzoTransaction> transactions) {
+    public void annotateTransactionsAsExported(List<Transaction> transactions) {
         ZonedDateTime exportTimestamp = ZonedDateTime.now();
         Map<String, String> metadata = new HashMap<>();
-        metadata.put("csv-exported", exportTimestamp.format(DateTimeFormatter.ISO_DATE_TIME));
+        metadata.put("csv_exported", exportTimestamp.format(DateTimeFormatter.ISO_DATE_TIME));
 
         transactions.forEach(transaction -> monzoClient.setMetadataOnTransaction(transaction.getId(), metadata));
     }

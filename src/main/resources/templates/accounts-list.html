@@ -10,5 +10,10 @@
     <div th:each="account: ${accounts}">
         <a th:href="@{/{accountId}(accountId=${account.id})}" th:text="${account.description}"></a>
     </div>
+
+    <div>
+        <a th:href="@{/shutdown}" th:text="Shutdown"/>
+    </div>
+
 </body>
 </html>

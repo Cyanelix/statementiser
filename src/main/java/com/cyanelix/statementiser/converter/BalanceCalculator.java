@@ -1,7 +1,6 @@
 package com.cyanelix.statementiser.converter;
 
-import com.cyanelix.statementiser.domain.MonzoTransaction;
-import com.cyanelix.statementiser.domain.MonzoTransactions;
+import com.cyanelix.statementiser.domain.Transaction;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,17 +10,17 @@ import java.util.Objects;
 
 @Component
 public class BalanceCalculator {
-    public List<MonzoTransaction> calculateBalances(int currentBalance, List<MonzoTransaction> transactions) {
+    public List<Transaction> calculateBalances(int currentBalance, List<Transaction> transactions) {
         Objects.requireNonNull(transactions);
 
-        Collections.reverse(transactions);
-
-        List<MonzoTransaction> transactionsWithBalances = new ArrayList<>(transactions.size());
+        List<Transaction> transactionsWithBalances = new ArrayList<>(transactions.size());
         int previousAmount = 0;
         int runningBalance = currentBalance;
-        for (MonzoTransaction transaction : transactions) {
+        for (int i = transactions.size() - 1; i > -1; i--) {
+            Transaction transaction = transactions.get(i);
+
             runningBalance = runningBalance - previousAmount;
-            transactionsWithBalances.add(new MonzoTransaction(transaction, runningBalance));
+            transactionsWithBalances.add(new Transaction(transaction, runningBalance));
             previousAmount = transaction.getAmount();
 
         }

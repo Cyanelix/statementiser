@@ -2,11 +2,18 @@ package com.cyanelix.statementiser.controller;
 
 import com.cyanelix.statementiser.client.MonzoClient;
 import com.cyanelix.statementiser.converter.BalanceCalculator;
-import com.cyanelix.statementiser.converter.MonzoTransactionsToCsvConverter;
-import com.cyanelix.statementiser.domain.*;
+import com.cyanelix.statementiser.converter.TransactionsToCsvConverter;
+import com.cyanelix.statementiser.domain.Transaction;
+import com.cyanelix.statementiser.monzo.MonzoAccount;
+import com.cyanelix.statementiser.monzo.MonzoBalance;
+import com.cyanelix.statementiser.monzo.MonzoTokenReponse;
 import com.cyanelix.statementiser.service.TransactionsService;
 import com.cyanelix.statementiser.state.MonzoTokenHolder;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,20 +24,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-public class MonzoController {
+public class MonzoController implements ApplicationContextAware {
     private final MonzoClient monzoClient;
     private final TransactionsService transactionsService;
     private final BalanceCalculator balanceCalculator;
     private final FilenameGenerator filenameGenerator;
     private final MonzoTokenHolder monzoTokenHolder;
+
+    private ApplicationContext applicationContext;
 
     @Autowired
     public MonzoController(MonzoClient monzoClient, TransactionsService transactionsService, BalanceCalculator balanceCalculator, FilenameGenerator filenameGenerator, MonzoTokenHolder monzoTokenHolder) {
@@ -55,24 +60,29 @@ public class MonzoController {
     }
 
     @GetMapping("/{accountId}")
-    public ResponseEntity<String> getCsv(@PathVariable("accountId") String accountId) {
-        List<MonzoTransaction> transactions = transactionsService.getNewTransactions(accountId);
-
-        transactionsService.annotateTransactionsAsExported(transactions);
+    public ResponseEntity<String> getNewTransactions(@PathVariable("accountId") String accountId) {
+        List<Transaction> transactions = transactionsService.getNewTransactions(accountId);
 
         MonzoBalance monzoBalance = monzoClient.getBalance(accountId);
 
-        List<MonzoTransaction> transactionsWithBalances = balanceCalculator.calculateBalances(
-                monzoBalance.getBalance(), transactions);
+        List<Transaction> transactionsWithBalances = balanceCalculator.calculateBalances(
+                monzoBalance.getBalanceIncludingFlexibleSavings(), transactions);
 
-        String csv = new MonzoTransactionsToCsvConverter().convert(transactionsWithBalances);
+        String csv = new TransactionsToCsvConverter().convert(transactionsWithBalances);
 
-        String filename = filenameGenerator.generateCsvFilename(getAccountById(accountId).getDescription(), transactionsWithBalances);
+        String filename = filenameGenerator.generateCsvFilename(
+                getAccountById(accountId).getDescription(), transactionsWithBalances);
 
         MultiValueMap<String, String> headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
 
         return new ResponseEntity<>(csv, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/shutdown")
+    public void shutdown() {
+        // TODO: Maybe start this in a thread with a few seconds delay, and return a goodbye page.
+        ((ConfigurableApplicationContext) applicationContext).close();
     }
 
     private MonzoAccount getAccountById(String accountId) {
@@ -82,4 +92,8 @@ public class MonzoController {
                 .orElseThrow(() -> new IllegalArgumentException("No account found with ID " + accountId));
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }

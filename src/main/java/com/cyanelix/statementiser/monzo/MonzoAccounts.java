@@ -1,4 +1,4 @@
-package com.cyanelix.statementiser.domain;
+package com.cyanelix.statementiser.monzo;
 
 import java.util.List;
 
