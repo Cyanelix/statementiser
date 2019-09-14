@@ -47,10 +47,15 @@ public class MonzoController implements ApplicationContextAware {
     }
 
     @GetMapping
-    public String getAccountsList(@RequestParam String code, Model model) {
+    public String authorise(@RequestParam String code) {
         MonzoTokenReponse monzoTokenReponse = monzoClient.exchangeAuthorisationCode(code);
         monzoTokenHolder.setTokenReponse(monzoTokenReponse);
 
+        return "standby";
+    }
+
+    @GetMapping("/accounts")
+    public String getAccountsList(Model model) {
         List<MonzoAccount> accounts = monzoClient.getAccounts().getAccounts().stream()
                 .filter(account -> !account.isClosed())
                 .collect(Collectors.toList());
@@ -59,7 +64,7 @@ public class MonzoController implements ApplicationContextAware {
         return "accounts-list";
     }
 
-    @GetMapping("/{accountId}")
+    @GetMapping("/account/{accountId}")
     public ResponseEntity<String> getNewTransactions(@PathVariable("accountId") String accountId) {
         List<Transaction> transactions = transactionsService.getNewTransactions(accountId);
 
