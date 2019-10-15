@@ -1,7 +1,10 @@
 package com.cyanelix.statementiser.client;
 
 import com.cyanelix.statementiser.config.MonzoClientConfig;
-import com.cyanelix.statementiser.monzo.*;
+import com.cyanelix.statementiser.monzo.MonzoAccounts;
+import com.cyanelix.statementiser.monzo.MonzoBalance;
+import com.cyanelix.statementiser.monzo.MonzoTokenReponse;
+import com.cyanelix.statementiser.monzo.MonzoTransactions;
 import com.cyanelix.statementiser.state.MonzoTokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;

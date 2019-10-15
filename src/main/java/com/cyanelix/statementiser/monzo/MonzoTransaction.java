@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 public class MonzoTransaction {
     private String id;
     private ZonedDateTime created;
+    private ZonedDateTime settled;
     private String description;
     private int amount;
     private MonzoMetadata metadata;
@@ -69,5 +70,13 @@ public class MonzoTransaction {
 
     public void setMetadata(MonzoMetadata metadata) {
         this.metadata = metadata;
+    }
+
+    public ZonedDateTime getSettled() {
+        return settled;
+    }
+
+    public void setSettled(ZonedDateTime settled) {
+        this.settled = settled;
     }
 }

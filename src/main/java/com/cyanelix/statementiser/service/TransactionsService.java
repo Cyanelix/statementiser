@@ -39,6 +39,7 @@ public class TransactionsService {
                 .filter(monzoTransaction -> !monzoTransaction.hasBeenExported())
                 .filter(transaction -> !transaction.isPotTransaction())
                 .filter(transaction -> transaction.getAmount() != 0)
+                .filter(transaction -> transaction.getSettled() != null)
                 .map(MonzoTransaction::toTransaction)
                 .collect(Collectors.toList());
     }
