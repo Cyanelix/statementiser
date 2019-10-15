@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 public class MonzoTransaction {
     private String id;
     private ZonedDateTime created;
-    private ZonedDateTime settled;
+    private String declineReason;
     private String description;
     private int amount;
     private MonzoMetadata metadata;
@@ -72,11 +72,11 @@ public class MonzoTransaction {
         this.metadata = metadata;
     }
 
-    public ZonedDateTime getSettled() {
-        return settled;
+    public String getDeclineReason() {
+        return declineReason;
     }
 
-    public void setSettled(ZonedDateTime settled) {
-        this.settled = settled;
+    public void setDeclineReason(String declineReason) {
+        this.declineReason = declineReason;
     }
 }

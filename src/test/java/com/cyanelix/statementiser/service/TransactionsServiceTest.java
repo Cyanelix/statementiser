@@ -197,6 +197,23 @@ public class TransactionsServiceTest {
     }
 
     @Test
+    public void singleTransactionWithDeclineReason_getNewTransaction_returnsEmptyList() {
+        // Given...
+        String accountId = "foo";
+
+        MonzoTransaction transaction = createTransaction(1);
+        transaction.setDeclineReason("INSUFFICIENT_FUNDS");
+
+        given(monzoClient.getTransactions(accountId)).willReturn(new MonzoTransactions(Collections.singletonList(transaction)));
+
+        // When...
+        List<Transaction> transactions = transactionsService.getNewTransactions(accountId);
+
+        // Then...
+        assertThat(transactions).isEmpty();
+    }
+
+    @Test
     public void multipleTransactions_getNewTransactions_filteredCorrectly() {
         // Given...
         String accountId = "foo";
