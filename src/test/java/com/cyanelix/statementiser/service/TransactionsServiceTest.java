@@ -5,13 +5,12 @@ import com.cyanelix.statementiser.domain.Transaction;
 import com.cyanelix.statementiser.monzo.MonzoMetadata;
 import com.cyanelix.statementiser.monzo.MonzoTransaction;
 import com.cyanelix.statementiser.monzo.MonzoTransactions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -26,10 +25,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 public class TransactionsServiceTest {
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
-
     @Mock
     private MonzoClient monzoClient;
 

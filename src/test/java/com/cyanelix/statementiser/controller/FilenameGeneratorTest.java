@@ -1,7 +1,7 @@
 package com.cyanelix.statementiser.controller;
 
 import com.cyanelix.statementiser.domain.Transaction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
